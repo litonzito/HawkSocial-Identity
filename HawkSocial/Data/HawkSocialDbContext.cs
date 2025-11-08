@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HawkSocial.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class HawkSocialDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public HawkSocialDbContext(DbContextOptions<HawkSocialDbContext> options)
             : base(options)
         {
         }
