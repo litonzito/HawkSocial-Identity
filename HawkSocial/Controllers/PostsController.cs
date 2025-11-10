@@ -22,7 +22,7 @@ namespace HawkSocial.Controllers
 
         // FEED (HOME) //
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Feed()
         {
             var feed = await _context.Posts
                 .Include(p => p.User)
@@ -31,71 +31,77 @@ namespace HawkSocial.Controllers
                 .AsNoTracking() // mejora el rendimiento ademas de que no se haran cambios desde el feed, es puramente lectura
                 .ToListAsync();
 
-            return View(feed);
+            return View("Feed",feed);
         }
 
         // POST : se requiere autorizacion para crear posts //
         [Authorize, HttpPost]
-        public async Task<IActionResult> Create(Post input) 
-        {
-            // validacion basica del contenido del post //
-            if (!ModelState.IsValid) return RedirectToAction("Index");
+        public async Task<IActionResult> Create(EditPostViewModel input)      
 
+        {
             var user = await _users.GetUserAsync(User);
             if (user == null) return Challenge(); // en caso de que el usuario no este autenticado, redirige al login
+            // validacion basica del contenido del post //
+            if (!ModelState.IsValid) return RedirectToAction("Feed", "Posts");
 
             var post = new Post
             {
                 UserId = user.Id,
                 Content = (input.Content ?? string.Empty).Trim(),
-                CreatedAtUtc = DateTimeOffset.UtcNow
+                CreatedAtUtc = DateTime.UtcNow
             };
 
             _context.Add(post);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Feed", "Posts");
         }
 
         // GET: Editar post //
         [Authorize, HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return Challenge(); // en caso de que el usuario no este autenticado, redirige al login
+
             var post = await _context.Posts.FindAsync(id);
             if (post == null) return NotFound();
 
-            var user = await _users.GetUserAsync(User);
-            if (user == null) return Challenge(); // en caso de que el usuario no este autenticado, redirige al login
             if (post.UserId != user!.Id) return Forbid();
 
-            // verifica si el post esta dentro de la ventana de edicion permitida 
-            if (DateTimeOffset.UtcNow - post.CreatedAtUtc >= EditWindow) return Forbid();
-            
-            return View(post);
+            // verifica si el post esta dentro de la ventana de edicion permitida(5 minutos) 
+            if (DateTime.UtcNow - post.CreatedAtUtc >= EditWindow) return Forbid();
+            var contentPost = new EditPostViewModel
+            {
+                Content = post.Content
+            };
+            return View(contentPost);
         }
 
-        // POST: Editar post //
+        // POST: Editar post // - Se utiliza post ya qe los formularios HTML no soportan PUT o PATCH
         [Authorize, HttpPost]
-        public async Task<IActionResult> Edit(int id, Post input)
+        public async Task<IActionResult> Edit(int id, EditPostViewModel input)
         {
-            if (!ModelState.IsValid) return View(input);
+            var user = await _users.GetUserAsync(User);
+            if (user == null) return Challenge(); // en caso de que el usuario no este autenticado, redirige al login
 
             var post = await _context.Posts.FindAsync(id);
             if (post == null) return NotFound();
 
-            var user = await _users.GetUserAsync(User);
-            if (user == null) return Challenge(); // en caso de que el usuario no este autenticado, redirige al login
             if (post.UserId != user!.Id) return Forbid();
 
-            // verifica si el post esta dentro de la ventana de edicion permitida 
-            if (DateTimeOffset.UtcNow - post.CreatedAtUtc >= EditWindow) return Forbid();
+            // verifica si el post esta dentro de la ventana de edicion permitida(5 minutos) 
+            if (DateTime.UtcNow - post.CreatedAtUtc >= EditWindow) return Forbid();
+
+            if (!ModelState.IsValid) return View(input);
 
             post.Content = input.Content.Trim();
             post.IsEdited = true;
-            post.UpdatedAtUtc = DateTimeOffset.UtcNow;
-            _context.Update(post);
+            post.UpdatedAtUtc = DateTime.UtcNow;
+
+            // _context.Update(post); -- no es necesario llamar a Update ya que el post ya esta siendo rastreado y modificado en las instrucciones de arriba. La parte de actualizar se hace abajo con SaveChangesAsync
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("Feed", "Posts");
         }
     }
 }

@@ -1,0 +1,45 @@
+﻿@model List<HawkSocial.Models.Post>
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Feed";
+}
+
+
+@if (User.Identity!.IsAuthenticated)
+{
+    <h2>Create a post 😎</h2>
+
+    <form asp-controller="Posts" asp-action="Create" method="post" class="mb-4">
+        <textarea name="Content" class="form-control" maxlength="140" placeholder="Tell us what you thinking?" required></textarea>
+        <button class="btn btn-primary mt-2">Publish</button>
+    </form>
+}
+<h2>Feed 🗣️</h2>
+
+@foreach (var post in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <strong>@post.User.UserName</strong>
+            <span class="text-muted small">@post.CreatedAtUtc.ToLocalTime().ToString("g")</span>
+
+            @if (post.IsEdited)
+            {
+                <span class="badge bg-secondary">Edited</span>
+            }
+
+            <p>@post.Content</p>
+
+            @if (User.Identity!.IsAuthenticated && post.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                // ventanas de edicion
+                var diff = DateTime.UtcNow - post.CreatedAtUtc;
+                if (diff.TotalMinutes < 5)
+                {
+                    <a asp-controller="Posts" asp-action="Edit" asp-route-id="@post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                }
+            }
+        </div>
+    </div>
+}

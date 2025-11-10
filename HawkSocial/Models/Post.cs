@@ -14,8 +14,8 @@ namespace HawkSocial.Models
         public string Content { get; set; } = string.Empty;
 
         // METADATA //
-        public DateTimeOffset CreatedAtUtc { get; set; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset? UpdatedAtUtc { get; set; }
+        public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAtUtc { get; set; }
         public bool IsEdited { get; set; } = false;
 
         // FK //
