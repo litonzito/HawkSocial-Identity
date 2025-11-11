@@ -1,4 +1,5 @@
 using System.Data.Common;
+using AspNet.Security.OAuth.GitHub;
 using HawkSocial.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,16 @@ builder.Services.AddDbContext<HawkSocialDbContext>(options =>
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false) // se puede cambiar a true si se desea confirmar cuenta via email
     .AddEntityFrameworkStores<HawkSocialDbContext>();
+
+builder.Services
+    .AddAuthentication()
+    .AddGitHub(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"] ?? string.Empty;
+        options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"] ?? string.Empty;
+        options.Scope.Add("user:email"); // request email info so Identity can populate it
+    });
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -40,6 +51,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
