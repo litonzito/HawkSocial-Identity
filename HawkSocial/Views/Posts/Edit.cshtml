@@ -1,21 +1,59 @@
 ﻿@model EditPostViewModel
 
 @{
-    ViewData["Title"] = "Editar Post";
+    ViewData["Title"] = "Edit Post";
 }
 
-<h2>Editar Post</h2>
+<style>
+    body {
+        background-color: #f5f6fa;
+    }
+    .edit-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .edit-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .edit-header img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .form-label {
+        font-weight: 500;
+    }
+    textarea.form-control {
+        border-radius: 10px;
+        resize: none;
+        height: 120px;
+    }
+ 
+</style>
 
-<form  asp-controller="Posts" asp-action="Edit" method="post">
-    <div class="mb-3">
-        <label asp-for="Content" class="form-label"></label>
-        <textarea asp-for="Content" class="form-control" maxlength="140"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
+<div class="edit-container">
+    <div class="edit-header">
+        <h4 class="mb-0">Edit Post</h4>
     </div>
 
-    <button class="btn btn-primary">Save</button>
-    <a asp-controller="Posts" asp-action="Feed" class="btn btn-secondary">Cancel</a>
-</form>
+    <form asp-controller="Posts" asp-action="Edit" method="post">
+        <div class="mb-3">
+            <label asp-for="Content" class="form-label">Post content</label>
+            <textarea asp-for="Content" class="form-control" maxlength="140"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+        </div>
+
+        <button class="btn btn-primary">Save Changes</button>
+        <a asp-controller="Posts" asp-action="Feed" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -5,41 +5,97 @@
     ViewData["Title"] = "Feed";
 }
 
+<style>
+    body {
+        background-color: #f5f6fa;
+    }
+    .feed-container {
+        max-width: 650px;
+        margin: 0 auto;
+        padding-top: 30px;
+    }
+    .create-post {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+    .feed-post {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.1s ease-in-out;
+    }
+    .feed-post:hover {
+        transform: scale(1.01);
+    }
+    .feed-post + .feed-post {
+        margin-top: 15px;
+    }
+    .username {
+        font-weight: 600;
+    }
+    .timestamp {
+        color: #888;
+        font-size: 0.9rem;
+    }
+    textarea.form-control {
+        border-radius: 10px;
+        resize: none;
+    }
+    .post-actions a {
+        margin-right: 8px;
+    }
+</style>
 
-@if (User.Identity!.IsAuthenticated)
-{
-    <h2>Create a post 😎</h2>
+<div class="feed-container">
 
-    <form asp-controller="Posts" asp-action="Create" method="post" class="mb-4">
-        <textarea name="Content" class="form-control" maxlength="140" placeholder="Tell us what you thinking?" required></textarea>
-        <button class="btn btn-primary mt-2">Publish</button>
-    </form>
-}
-<h2>Feed 🗣️</h2>
+    @if (User.Identity!.IsAuthenticated)
+    {
+        <div class="create-post">
+            <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0">Create a post</h5>
+            </div>
 
-@foreach (var post in Model)
-{
-    <div class="card mb-3">
-        <div class="card-body">
-            <strong>@post.User.UserName</strong>
-            <span class="text-muted small">@post.CreatedAtUtc.ToLocalTime().ToString("g")</span>
+            <form asp-controller="Posts" asp-action="Create" method="post">
+                <textarea name="Content" class="form-control mb-2" maxlength="140"
+                          placeholder="Tell us what you're thinking!" required></textarea>
+                <button class="btn btn-primary w-100 rounded-pill">Publish</button>
+            </form>
+        </div>
+    }
 
-            @if (post.IsEdited)
-            {
-                <span class="badge bg-secondary">Edited</span>
-            }
+    <h5 class="mb-3 text-muted">Recent Posts</h5>
 
-            <p>@post.Content</p>
+    @foreach (var post in Model)
+    {
+        <div class="feed-post">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div>
+                    <span class="username">@post.User.UserName</span><br />
+                    <span class="timestamp">@post.CreatedAtUtc.ToLocalTime().ToString("g")</span>
+                </div>
+                @if (post.IsEdited)
+                {
+                    <span class="badge bg-light text-secondary border">Edited</span>
+                }
+            </div>
+
+            <p class="mb-2">@post.Content</p>
 
             @if (User.Identity!.IsAuthenticated && post.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
             {
-                // ventanas de edicion
                 var diff = DateTime.UtcNow - post.CreatedAtUtc;
                 if (diff.TotalMinutes < 5)
                 {
-                    <a asp-controller="Posts" asp-action="Edit" asp-route-id="@post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <div class="post-actions">
+                        <a asp-controller="Posts" asp-action="Edit" asp-route-id="@post.Id"
+                           class="btn btn-sm btn-outline-secondary rounded-pill">Edit</a>
+                    </div>
                 }
             }
         </div>
-    </div>
-}
+    }
+</div>

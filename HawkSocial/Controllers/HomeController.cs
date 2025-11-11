@@ -15,6 +15,10 @@ namespace HawkSocial.Controllers
 
         public IActionResult Index()
         {
+            if(User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Feed", "Posts");
+            }
             return View();
         }
 

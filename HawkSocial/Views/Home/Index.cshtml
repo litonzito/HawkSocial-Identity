@@ -1,8 +1,70 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "HawkSocial";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    
+    .card:hover .card-title {
+        color: #0d6efd; 
+    }
+</style>
+
+<div class="container py-5 text-center">
+    <h1 class="display-4 fw-bold mb-3">Welcome to HawkSocial</h1>
+    <p class="lead text-muted mb-4">
+        A modern social network to share your thoughts, now made in C#!
+    </p>
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg px-4">
+            Join Now
+        </a>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-secondary btn-lg px-4">
+            Log In
+        </a>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row justify-content-center text-start">
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Secure</h5>
+                    <p class="card-text text-muted">
+                        Hash protected passwords.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Share</h5>
+                    <p class="card-text text-muted">
+                        Express your ideas via post, then edit them in case of any mistake.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Discover</h5>
+                    <p class="card-text text-muted">
+                        Discover the wonderful use of ASP.NET Core Identity.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
